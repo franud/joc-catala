@@ -1,0 +1,746 @@
+<title>El Terrat dels Gats</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: una sola columna de joc (màx. 760px) sobre un terrat al capvespre; pantalles que s'alternen. Estètica única i clara. */
+:root {
+  --paper: #FFF4DC;
+  --paper-2: #FFE9BD;
+  --ink: #2E2440;
+  --ink-soft: #5E5270;
+  --tangerine: #EE7A35;
+  --mint: #2A9D7F;
+  --mint-bg: #DDF3EA;
+  --coral: #D9485F;
+  --coral-bg: #FBE1E4;
+  --card: #FFFFFF;
+  --line: #EAD7AE;
+  --roof-1: #E2663F;
+  --roof-2: #3E8FCB;
+  --roof-3: #8A63C2;
+  --roof-4: #2E9E6E;
+  --roof-5: #D9961C;
+  --f-display: "Grandstander", "Comic Sans MS", "Chalkboard SE", system-ui, sans-serif;
+  --f-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, #FFE2A8 0 60px, transparent 61px),
+    radial-gradient(circle at 90% 30%, rgba(255,255,255,.6) 0 3px, transparent 4px),
+    radial-gradient(circle at 70% 12%, rgba(255,255,255,.6) 0 2px, transparent 3px);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 18px;
+  line-height: 1.5;
+}
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 7vw, 3.1rem); font-weight: 800; }
+h2 { font-size: clamp(1.5rem, 5vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.25rem; font-weight: 800; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 4px solid var(--roof-2); outline-offset: 3px; }
+
+.btn {
+  border: 0;
+  border-radius: 999px;
+  background: var(--tangerine);
+  color: #fff;
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  padding: 14px 30px;
+  box-shadow: 0 5px 0 #B9551D;
+  transition: transform .08s;
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #B9551D; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: var(--card); color: var(--ink); box-shadow: 0 5px 0 var(--line); border: 2px solid var(--line); }
+.btn.small { font-size: 1rem; padding: 9px 18px; }
+
+.screen { display: flex; flex-direction: column; gap: 22px; }
+
+/* ---------- Gat ---------- */
+.cat { --cat:#F2994A; --stripe:#D06A22; --belly:#FFE3C4; --catline:#2E2440; --ear:#F7A6B5; display: block; }
+.cat[data-color="gris"]   { --cat:#9AA4B0; --stripe:#6F7987; --belly:#E7ECF0; }
+.cat[data-color="negre"]  { --cat:#3B3446; --stripe:#2A2433; --belly:#5A5068; --catline:#F6EBDD; --ear:#C9798A; }
+.cat[data-color="blanc"]  { --cat:#FBF7F1; --stripe:#E9A15C; --belly:#FFFFFF; --ear:#F7A6B5; }
+.cat svg { width: 100%; height: auto; display: block; overflow: visible; }
+.cat .eyes-happy, .cat .mouth-sad, .cat .blush { display: none; }
+.cat.happy .eyes-open { display: none; }
+.cat.happy .eyes-happy, .cat.happy .blush { display: inline; }
+.cat.sad .mouth-ok { display: none; }
+.cat.sad .mouth-sad { display: inline; }
+.cat.happy svg { animation: hop .5s ease; }
+.cat .tail { transform-origin: 150px 165px; animation: wag 2.4s ease-in-out infinite; }
+@keyframes hop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-14px); } }
+@keyframes wag { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
+
+/* ---------- Inici ---------- */
+.start { align-items: center; text-align: center; padding-top: 10px; }
+.start .cat { width: min(220px, 55vw); }
+.start .eyebrow { font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; color: var(--tangerine); }
+.name-box { background: var(--card); border: 3px solid var(--ink); border-radius: 24px; padding: 22px; width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 16px; box-shadow: 8px 8px 0 var(--ink); }
+.name-box label { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; }
+.name-box input {
+  font: inherit; font-size: 1.4rem; font-weight: 800; text-align: center;
+  border: 3px dashed var(--tangerine); border-radius: 16px; padding: 12px; width: 100%;
+  background: var(--paper); color: var(--ink);
+}
+.swatches { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.swatch { width: 64px; border: 3px solid transparent; border-radius: 16px; padding: 4px; background: var(--paper); display: flex; flex-direction: column; align-items: center; font-size: .8rem; font-weight: 800; }
+.swatch[aria-pressed="true"] { border-color: var(--ink); background: var(--paper-2); }
+.swatch .cat { width: 48px; }
+.hint { color: var(--ink-soft); font-size: .95rem; }
+
+/* ---------- Barra ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.fishcount { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.fish { width: 34px; height: 22px; flex: none; }
+.iconbtn { border: 2px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: .95rem; }
+
+/* ---------- Mapa ---------- */
+.hello { display: flex; align-items: center; gap: 16px; }
+.hello .cat { width: 96px; flex: none; }
+.hello p { color: var(--ink-soft); }
+.roofs { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 26px 18px; padding-top: 18px; }
+.house {
+  position: relative; text-align: left; border: 3px solid var(--ink); border-radius: 6px 6px 18px 18px;
+  background: var(--card); padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 6px 6px 0 var(--ink); transition: transform .12s;
+}
+.house:hover { transform: translateY(-3px) rotate(-.5deg); }
+.house::before {
+  content: ""; position: absolute; left: -12px; right: -12px; top: -24px; height: 30px;
+  background: var(--roof); clip-path: polygon(6% 100%, 50% 0, 94% 100%); border-radius: 4px;
+}
+.house .num { position: absolute; right: 12px; top: 10px; font-family: var(--f-display); font-weight: 800; color: var(--roof); font-size: 1.6rem; }
+.house h3 { padding-right: 34px; }
+.house p { font-size: .95rem; color: var(--ink-soft); }
+.stars { display: flex; gap: 4px; margin-top: 4px; }
+.star { width: 26px; height: 26px; }
+.star path { fill: #EADFC8; stroke: #CDBB97; stroke-width: 2; }
+.star.on path { fill: #FFC93C; stroke: #C98A00; }
+.diploma-cta { background: var(--ink); color: var(--paper); border-radius: 20px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.diploma-cta p { color: var(--paper-2); }
+
+/* ---------- Truc del gat ---------- */
+.tip { background: var(--card); border: 3px solid var(--ink); border-radius: 24px; padding: 22px; box-shadow: 8px 8px 0 var(--roof); display: flex; flex-direction: column; gap: 14px; }
+.tip .label { font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; color: var(--roof); }
+.tip ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; }
+.tip li { max-width: 62ch; }
+.tip b, .qtext b, .why b { color: var(--roof); }
+.tip .ex { background: var(--paper); border-radius: 10px; padding: 1px 8px; font-weight: 800; white-space: nowrap; }
+.tip-head { display: flex; gap: 14px; align-items: center; }
+.tip-head .cat { width: 84px; flex: none; }
+
+/* ---------- Pregunta ---------- */
+.paws { display: flex; gap: 6px; flex-wrap: wrap; }
+.paw { width: 26px; height: 26px; }
+.paw path, .paw ellipse { fill: #E6D6B3; }
+.paw.ok path, .paw.ok ellipse { fill: var(--mint); }
+.paw.ko path, .paw.ko ellipse { fill: var(--coral); }
+.paw.now path, .paw.now ellipse { fill: var(--ink); }
+.stage { display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: end; }
+.stage .cat { width: 120px; }
+.bubble { position: relative; background: var(--card); border: 3px solid var(--ink); border-radius: 22px; padding: 18px 20px; min-width: 0; }
+.bubble::after { content: ""; position: absolute; left: -16px; bottom: 26px; border: 10px solid transparent; border-right: 16px solid var(--ink); }
+.qtext { font-size: 1.25rem; font-weight: 700; }
+.qtext .word { display: inline-block; font-family: var(--f-display); font-size: 1.9rem; font-weight: 800; color: var(--roof); letter-spacing: .03em; }
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.opt {
+  border: 3px solid var(--ink); background: var(--card); border-radius: 18px; padding: 14px 12px;
+  font-size: 1.3rem; font-weight: 800; box-shadow: 0 5px 0 var(--ink); transition: transform .08s;
+}
+.opt:hover:not([disabled]) { background: var(--paper-2); }
+.opt:active:not([disabled]) { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
+.opt[disabled] { cursor: default; }
+.opt.right { background: var(--mint-bg); border-color: var(--mint); box-shadow: 0 5px 0 var(--mint); }
+.opt.wrong { background: var(--coral-bg); border-color: var(--coral); box-shadow: 0 5px 0 var(--coral); text-decoration: line-through; }
+.feedback { border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; border: 3px solid; }
+.feedback.ok { background: var(--mint-bg); border-color: var(--mint); }
+.feedback.ko { background: var(--coral-bg); border-color: var(--coral); }
+.feedback h3 { color: var(--ink); }
+.feedback .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- Final i diploma ---------- */
+.result { align-items: center; text-align: center; }
+.result .cat { width: 170px; }
+.result .stars .star { width: 54px; height: 54px; }
+.result .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.diploma { background: var(--card); border: 6px double var(--roof-5); border-radius: 18px; padding: 28px 20px; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; box-shadow: 10px 10px 0 var(--ink); }
+.diploma .who { font-family: var(--f-display); font-weight: 800; font-size: clamp(2rem, 8vw, 3rem); color: var(--tangerine); border-bottom: 3px dashed var(--line); padding: 0 16px 4px; word-break: break-word; }
+.diploma .cats { display: flex; gap: 6px; justify-content: center; }
+.diploma .cats .cat { width: 70px; }
+
+.pop { position: fixed; pointer-events: none; z-index: 20; animation: rise 1.1s ease-out forwards; }
+.pop .fish { width: 48px; height: 32px; }
+@keyframes rise { from { transform: translateY(0) scale(.6); opacity: 1; } to { transform: translateY(-140px) scale(1.2); opacity: 0; } }
+
+@media (max-width: 520px) {
+  body { font-size: 17px; }
+  .stage { grid-template-columns: 1fr; }
+  .stage .cat { width: 96px; }
+  .bubble::after { left: 34px; top: -26px; bottom: auto; border: 10px solid transparent; border-bottom: 16px solid var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="app" id="app">
+
+  <!-- INICI -->
+  <section class="screen start" id="s-start">
+    <p class="eyebrow">Un joc de català amb gats</p>
+    <h1>El Terrat dels Gats</h1>
+    <div class="cat" id="startCat" data-color="taronja"></div>
+    <form class="name-box" id="nameForm" autocomplete="off">
+      <label for="nameInput">Primer de tot: com et dius?</label>
+      <input id="nameInput" maxlength="20" placeholder="Escriu el teu nom aquí">
+      <div>
+        <p class="hint" style="margin-bottom:8px">Tria el teu gat company:</p>
+        <div class="swatches" id="swatches"></div>
+      </div>
+      <button class="btn" id="goBtn" type="submit" disabled>Som-hi!</button>
+    </form>
+  </section>
+
+  <!-- MAPA -->
+  <section class="screen" id="s-map" hidden>
+    <div class="topbar">
+      <div class="fishcount"><span class="fishicon"></span><span><span id="fishMap">0</span> peixos</span></div>
+      <div style="display:flex;gap:8px">
+        <button class="iconbtn sound-toggle" type="button">So: sí</button>
+        <button class="iconbtn" type="button" id="changeName">Canviar nom</button>
+      </div>
+    </div>
+    <div class="hello">
+      <div class="cat happy" id="mapCat"></div>
+      <div>
+        <h2>Hola, <span id="helloName"></span>!</h2>
+        <p>Cada teulada amaga un repte de català. Encerta preguntes, pesca peixos per al teu gat i aconsegueix les tres estrelles!</p>
+      </div>
+    </div>
+    <div class="roofs" id="roofs"></div>
+    <div class="diploma-cta" id="diplomaCta" hidden>
+      <div>
+        <h3>Has visitat totes les teulades!</h3>
+        <p>El teu diploma t'espera.</p>
+      </div>
+      <button class="btn" type="button" id="openDiploma">Veure el diploma</button>
+    </div>
+  </section>
+
+  <!-- TRUC -->
+  <section class="screen" id="s-tip" hidden>
+    <div class="topbar">
+      <button class="iconbtn back" type="button">← Terrat</button>
+    </div>
+    <div class="tip" id="tipBox"></div>
+    <div><button class="btn" type="button" id="startLevel">Comencem!</button></div>
+  </section>
+
+  <!-- PREGUNTA -->
+  <section class="screen" id="s-q" hidden>
+    <div class="topbar">
+      <button class="iconbtn back" type="button">← Terrat</button>
+      <div class="fishcount"><span class="fishicon"></span><span id="fishQ">0</span></div>
+    </div>
+    <div class="paws" id="paws" aria-label="Progrés"></div>
+    <div class="stage">
+      <div class="cat" id="qCat"></div>
+      <div class="bubble"><p class="qtext" id="qText"></p></div>
+    </div>
+    <div class="options" id="opts"></div>
+    <div class="feedback" id="feedback" hidden></div>
+  </section>
+
+  <!-- RESULTAT -->
+  <section class="screen result" id="s-result" hidden></section>
+
+  <!-- DIPLOMA -->
+  <section class="screen" id="s-diploma" hidden>
+    <div class="topbar"><button class="iconbtn back" type="button">← Terrat</button></div>
+    <div class="diploma">
+      <p class="hint" style="text-transform:uppercase;letter-spacing:.14em;font-weight:800">Diploma oficial del Terrat dels Gats</p>
+      <p>Aquest diploma és per a</p>
+      <p class="who" id="dipName"></p>
+      <p style="max-width:46ch">per haver après els <b>accents</b>, els <b>diftongs i hiats</b>, la <b>o i la u àtones</b>, els <b>determinants</b> i les <b>paraules polisèmiques</b>. Els gats del terrat estan molt orgullosos!</p>
+      <p><b id="dipFish"></b></p>
+      <div class="cats" id="dipCats"></div>
+      <p class="hint">Miau, miau, miau! (Que en idioma gat vol dir: felicitats!)</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Dibuixos ---------- */
+  const CAT_SVG = `
+<svg viewBox="0 0 200 210" aria-hidden="true">
+  <path class="tail" d="M148 168 C 192 160, 196 112, 168 98" stroke="var(--cat)" stroke-width="15" fill="none" stroke-linecap="round"/>
+  <ellipse cx="100" cy="160" rx="56" ry="42" fill="var(--cat)"/>
+  <ellipse cx="100" cy="170" rx="30" ry="27" fill="var(--belly)"/>
+  <ellipse cx="78" cy="198" rx="15" ry="9" fill="var(--cat)"/>
+  <ellipse cx="122" cy="198" rx="15" ry="9" fill="var(--cat)"/>
+  <polygon points="46,74 56,18 94,52" fill="var(--cat)"/>
+  <polygon points="154,74 144,18 106,52" fill="var(--cat)"/>
+  <polygon points="58,62 61,34 82,52" fill="var(--ear)"/>
+  <polygon points="142,62 139,34 118,52" fill="var(--ear)"/>
+  <ellipse cx="100" cy="92" rx="60" ry="50" fill="var(--cat)"/>
+  <path d="M90 44 L94 62 M100 42 L100 62 M110 44 L106 62" stroke="var(--stripe)" stroke-width="5" stroke-linecap="round"/>
+  <g class="eyes-open">
+    <ellipse cx="77" cy="88" rx="11" ry="13" fill="#8BD06F"/>
+    <ellipse cx="123" cy="88" rx="11" ry="13" fill="#8BD06F"/>
+    <ellipse cx="77" cy="89" rx="4" ry="10" fill="#1E1A24"/>
+    <ellipse cx="123" cy="89" rx="4" ry="10" fill="#1E1A24"/>
+    <circle cx="81" cy="83" r="3" fill="#fff"/>
+    <circle cx="127" cy="83" r="3" fill="#fff"/>
+  </g>
+  <g class="eyes-happy" stroke="var(--catline)" stroke-width="5" fill="none" stroke-linecap="round">
+    <path d="M66 92 Q77 78 88 92"/><path d="M112 92 Q123 78 134 92"/>
+  </g>
+  <g class="blush" fill="#F58FA3" opacity=".7"><ellipse cx="62" cy="108" rx="9" ry="5"/><ellipse cx="138" cy="108" rx="9" ry="5"/></g>
+  <path d="M93 104 L107 104 L100 112 Z" fill="#F07C95"/>
+  <path class="mouth-ok" d="M100 112 Q95 121 86 117 M100 112 Q105 121 114 117" stroke="var(--catline)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path class="mouth-sad" d="M88 124 Q100 113 112 124" stroke="var(--catline)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <g stroke="var(--catline)" stroke-width="2.5" stroke-linecap="round" opacity=".75">
+    <path d="M68 106 L28 98"/><path d="M68 112 L28 116"/><path d="M132 106 L172 98"/><path d="M132 112 L172 116"/>
+  </g>
+</svg>`;
+  const FISH_SVG = `<svg class="fish" viewBox="0 0 44 28" aria-hidden="true"><path d="M3 14 L12 4 L12 24 Z" fill="#3E8FCB"/><ellipse cx="26" cy="14" rx="16" ry="10" fill="#5FB0E8"/><path d="M20 6 Q24 14 20 22" stroke="#3E8FCB" stroke-width="2" fill="none"/><circle cx="34" cy="11" r="2.4" fill="#2E2440"/></svg>`;
+  const STAR_SVG = (on) => `<svg class="star${on ? " on" : ""}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1 6.1 20.3l1.3-6.5L2.5 9.3l6.6-.8z" stroke-linejoin="round"/></svg>`;
+  const PAW_SVG = (cls) => `<svg class="paw ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 13c-3.2 0-6 3-6 5.4 0 1.7 1.4 2.6 3 2.6 1.2 0 2-.6 3-.6s1.8.6 3 .6c1.6 0 3-.9 3-2.6C18 16 15.2 13 12 13z"/><ellipse cx="5" cy="10" rx="2.2" ry="2.8"/><ellipse cx="9.2" cy="5.8" rx="2.2" ry="2.9"/><ellipse cx="14.8" cy="5.8" rx="2.2" ry="2.9"/><ellipse cx="19" cy="10" rx="2.2" ry="2.8"/></svg>`;
+
+  const COLORS = [["taronja", "Taronja"], ["gris", "Gris"], ["negre", "Negre"], ["blanc", "Blanc"]];
+
+  /* ---------- Preguntes ---------- */
+  // Q(text, opcions, explicació, índex correcte, ordre fix)
+  const Q = (q, o, why, a = 0, fixed = false) => ({ q, o, why, a, fixed });
+  const W = (w) => `<span class="word">${w}</span>`;
+  const TYPE = (w, a, why) => Q(`La paraula ${W(w)} és…`, ["Aguda", "Plana", "Esdrúixola"], why, a, true);
+  const DH = (w, isDif, why) => Q(`La paraula ${W(w)} té…`, ["Un diftong", "Un hiat"], why, isDif ? 0 : 1, true);
+  const OU = (blank, letter, why) => Q(`Quina vocal falta? ${W(blank)}`, ["o", "u"], why, letter === "o" ? 0 : 1, true);
+
+  const LEVELS = [
+    {
+      title: "La teulada dels accents",
+      sub: "Agudes, planes i esdrúixoles",
+      roof: "var(--roof-1)",
+      tip: `
+        <li>La <b>síl·laba tònica</b> és la que sona més forta: ca-<b>MÍ</b>, <b>CA</b>-sa, <b>MÚ</b>-si-ca.</li>
+        <li><b>Agudes</b> (la tònica és l'última): porten accent si acaben en <b>vocal</b>, <b>vocal + s</b>, <b>-en</b> o <b>-in</b>. <span class="ex">sofà</span> <span class="ex">ratolí</span> <span class="ex">anglès</span> <span class="ex">també</span>. Però <span class="ex">gatet</span> no!</li>
+        <li><b>Planes</b> (la tònica és la penúltima): porten accent si <b>NO</b> acaben així. <span class="ex">fàcil</span> <span class="ex">préssec</span>. Però <span class="ex">llapis</span> i <span class="ex">examen</span> no en porten!</li>
+        <li><b>Esdrúixoles</b> (la tònica és l'antepenúltima): porten accent <b>sempre</b>. <span class="ex">música</span> <span class="ex">gàbia</span> <span class="ex">simpàtic</span></li>
+        <li>La <b>a</b> sempre porta accent obert (<b>à</b>); la <b>i</b> i la <b>u</b>, sempre tancat (<b>í</b>, <b>ú</b>).</li>`,
+      qs: [
+        Q("Quina paraula està ben escrita?", ["ratolí", "ratoli", "ràtoli"], "<b>ratolí</b> és aguda (ra-to-<b>LÍ</b>) i acaba en vocal: porta accent."),
+        Q("Quina paraula està ben escrita?", ["sofà", "sofa", "sòfa"], "<b>sofà</b> és aguda i acaba en vocal. I la a sempre porta accent obert: à."),
+        Q("Quina paraula està ben escrita?", ["llapis", "llàpis", "llapís"], "<b>llapis</b> és plana (<b>LLA</b>-pis) i acaba en vocal + s. Les planes acabades així NO porten accent!"),
+        Q("Quina paraula està ben escrita?", ["fàcil", "facil", "facíl"], "<b>fàcil</b> és plana i acaba en -l. Com que no acaba en vocal, vocal + s, -en o -in, porta accent."),
+        Q("Quina paraula està ben escrita?", ["música", "musica", "musicà"], "<b>música</b> és esdrúixola (<b>MÚ</b>-si-ca). Les esdrúixoles porten accent sempre."),
+        Q("Quina paraula està ben escrita?", ["pastís", "pastis", "pàstis"], "<b>pastís</b> és aguda (pas-<b>TÍS</b>) i acaba en vocal + s: porta accent."),
+        Q("Quina paraula està ben escrita?", ["examen", "exàmen", "examén"], "<b>examen</b> és plana (e-<b>XA</b>-men) i acaba en -en: NO porta accent."),
+        Q("Quina paraula està ben escrita?", ["gàbia", "gabia", "gabía"], "<b>gàbia</b> és esdrúixola (<b>GÀ</b>-bi-a), així que porta accent sempre."),
+        Q("Quina paraula està ben escrita?", ["carrer", "carrér", "càrrer"], "<b>carrer</b> és aguda però acaba en -r. Les agudes acabades en -r no porten accent."),
+        Q("Quina paraula està ben escrita?", ["préssec", "pressec", "prèssec"], "<b>préssec</b> és plana i acaba en -c, per tant porta accent. La e sona tancada: é."),
+        Q("Quina paraula està ben escrita?", ["cafè", "café", "càfe"], "<b>cafè</b> és aguda i acaba en vocal. En català la e de cafè és oberta: è."),
+        Q("Quina paraula està ben escrita?", ["anglès", "angles", "anglés"], "<b>anglès</b> és aguda i acaba en vocal + s: porta accent obert, è."),
+        Q("Una d'aquestes paraules té una falta. Quina?", ["cançò", "pàgina", "també"], "S'escriu <b>cançó</b>, amb accent tancat. La o d'aquesta paraula sona tancada."),
+        Q("Per què <b>camió</b> porta accent?", ["És aguda i acaba en vocal", "És plana i acaba en -o", "Totes les paraules en porten"], "ca-mi-<b>Ó</b>: la tònica és l'última, i acaba en vocal."),
+        TYPE("simpàtic", 2, "sim-<b>PÀ</b>-tic: la tònica és l'antepenúltima. És esdrúixola!"),
+        TYPE("gatet", 0, "ga-<b>TET</b>: la tònica és l'última. És aguda, però no porta accent perquè acaba en -t."),
+        TYPE("cadira", 1, "ca-<b>DI</b>-ra: la tònica és la penúltima. És plana i acaba en vocal, per això no porta accent."),
+        TYPE("pingüí", 0, "pin-<b>GÜÍ</b>: la tònica és l'última. És aguda i acaba en vocal, per això porta accent.")
+      ]
+    },
+    {
+      title: "El cistell dels diftongs",
+      sub: "Diftongs i hiats",
+      roof: "var(--roof-2)",
+      tip: `
+        <li><b>Diftong</b>: dues vocals juntes a la <b>mateixa síl·laba</b>. <span class="ex">rei</span> <span class="ex">noi</span> <span class="ex">peu</span> <span class="ex">cui-na</span> <span class="ex">qua-tre</span></li>
+        <li>Els diftongs més habituals acaben en <b>i</b> o <b>u</b>: ai, ei, oi, ui, au, eu, iu, ou. I també els de <b>qu</b> i <b>gu</b> + vocal: qua-tre, ai-gua.</li>
+        <li><b>Hiat</b>: dues vocals juntes que van en <b>síl·labes diferents</b>. <span class="ex">po-e-ta</span> <span class="ex">te-a-tre</span> <span class="ex">di-a</span></li>
+        <li>La <b>dièresi</b> (els dos puntets ¨) avisa que hi ha un hiat: <span class="ex">ra-ïm</span> <span class="ex">ve-ï-na</span></li>
+        <li>Truc del gat: separa la paraula a cops de pota! Si les vocals cauen al mateix cop, és un diftong.</li>`,
+      qs: [
+        DH("rei", true, "<b>rei</b> té una sola síl·laba: la e i la i van juntes. Diftong!"),
+        DH("poeta", false, "Es separa <b>po-e-ta</b>: la o i la e van en síl·labes diferents. Hiat!"),
+        DH("cuina", true, "Es separa <b>cui-na</b>: la u i la i van juntes. Diftong!"),
+        DH("teatre", false, "Es separa <b>te-a-tre</b>: la e i la a van separades. Hiat!"),
+        DH("peu", true, "<b>peu</b> és una sola síl·laba. Diftong!"),
+        DH("raïm", false, "Es separa <b>ra-ïm</b>. La dièresi ja ens avisa que és un hiat."),
+        DH("quatre", true, "Es separa <b>qua-tre</b>: després de qu, la u i la a van juntes. Diftong!"),
+        DH("lleó", false, "Es separa <b>lle-ó</b>: la e i la o van en síl·labes diferents. Hiat!"),
+        DH("noi", true, "<b>noi</b> és una sola síl·laba. Diftong!"),
+        DH("dia", false, "Es separa <b>di-a</b>. En català, ia no fa diftong. Hiat!"),
+        DH("riu", true, "<b>riu</b> és una sola síl·laba. Diftong!"),
+        DH("país", false, "Es separa <b>pa-ís</b>: la a i la i van separades. Hiat!"),
+        DH("feina", true, "Es separa <b>fei-na</b>: la e i la i van juntes. Diftong!"),
+        DH("veïna", false, "Es separa <b>ve-ï-na</b>. La dièresi avisa del hiat."),
+        Q("Per què <b>raïm</b> porta dièresi (¨)?", ["Per avisar que la a i la i van en síl·labes diferents", "Perquè és una paraula aguda", "Perquè és plural"], "La dièresi marca el hiat: <b>ra-ïm</b>. Sense els puntets llegiríem «raim», amb diftong."),
+        Q(`Quantes síl·labes té ${W("poeta")}?`, ["3", "2", "4"], "<b>po-e-ta</b>: tres síl·labes, perquè la o i la e fan hiat."),
+        Q(`Com se separa ${W("cuina")}?`, ["cui-na", "cu-i-na", "c-ui-na"], "<b>cui-na</b>: ui és un diftong i va tot junt."),
+        Q(`Quin diftong s'amaga a ${W("miau")}?`, ["au", "ia", "mi"], "Es diu <b>mi-au</b>. La a i la u van juntes: diftong au. Miau!")
+      ]
+    },
+    {
+      title: "El misteri de la o i la u",
+      sub: "Vocals o i u àtones",
+      roof: "var(--roof-3)",
+      tip: `
+        <li>Quan la <b>o</b> no és la vocal forta (és <b>àtona</b>), sovint sona igual que una <b>u</b>. Per això dubtem!</li>
+        <li>Truc del gat detectiu: busca una paraula de la <b>mateixa família</b> on aquella vocal sigui la forta.</li>
+        <li><span class="ex">moix → moixet</span> (o) &nbsp; <span class="ex">fusta → fuster</span> (u) &nbsp; <span class="ex">joc → joguina</span> (o) &nbsp; <span class="ex">fum → fumar</span> (u)</li>
+        <li>Algunes paraules no tenen família que ajudi. Aquestes les has de recordar: <span class="ex">muntanya</span> <span class="ex">formiga</span> <span class="ex">tortuga</span></li>`,
+      qs: [
+        OU("m_ixet", "o", "<b>moixet</b> ve de <b>moix</b> (un gat!), on la o sona forta."),
+        OU("f_ster", "u", "<b>fuster</b> ve de <b>fusta</b>, on la u sona forta."),
+        OU("j_guina", "o", "<b>joguina</b> ve de <b>joc</b>."),
+        OU("f_mar", "u", "<b>fumar</b> ve de <b>fum</b>."),
+        OU("p_mera", "o", "<b>pomera</b> és l'arbre de la <b>poma</b>."),
+        OU("pl_jós", "u", "<b>plujós</b> ve de <b>pluja</b>."),
+        OU("fl_reta", "o", "<b>floreta</b> ve de <b>flor</b>."),
+        OU("s_crera", "u", "<b>sucrera</b> ve de <b>sucre</b>."),
+        OU("c_iner", "u", "<b>cuiner</b> ve de <b>cuina</b>."),
+        OU("p_rqueta", "o", "<b>porqueta</b> ve de <b>porc</b>."),
+        OU("f_guera", "o", "<b>foguera</b> ve de <b>foc</b>."),
+        OU("ll_meta", "u", "<b>llumeta</b> ve de <b>llum</b>."),
+        OU("s_cós", "u", "<b>sucós</b> ve de <b>suc</b>."),
+        OU("v_lar", "o", "<b>volar</b>: pensa en «l'ocell <b>vola</b>», on la o sona forta."),
+        OU("m_ntanya", "u", "S'escriu <b>muntanya</b>, amb u. Aquesta l'has de recordar!"),
+        OU("f_rmiga", "o", "S'escriu <b>formiga</b>, amb o. Aquesta l'has de recordar!"),
+        OU("t_rtuga", "o", "S'escriu <b>tortuga</b>, amb o. Lenta però segura!"),
+        OU("b_fanda", "u", "S'escriu <b>bufanda</b>, amb u. Els gats friolers en volen una!")
+      ]
+    },
+    {
+      title: "Els gats determinants",
+      sub: "Articles, demostratius, possessius…",
+      roof: "var(--roof-4)",
+      tip: `
+        <li>Els <b>determinants</b> van davant del nom i ens en diuen coses: quin és, de qui és, quants n'hi ha…</li>
+        <li><b>Articles</b>: <span class="ex">el, la, l', els, les</span> i <span class="ex">un, una, uns, unes</span></li>
+        <li><b>Demostratius</b>: <span class="ex">aquest, aquesta, aquell, aquella…</span> &nbsp; <b>Possessius</b>: <span class="ex">el meu, la teva, el seu…</span></li>
+        <li><b>Numerals</b>: <span class="ex">dos, tres, primer…</span> &nbsp; <b>Quantitatius</b>: <span class="ex">molts, pocs, alguns…</span></li>
+        <li>Davant de vocal o h, posem <b>apòstrof</b>: <span class="ex">l'àvia</span> <span class="ex">l'ós</span> <span class="ex">l'hora</span>. Però: <span class="ex">la universitat</span> (la u no és tònica).</li>
+        <li><b>Contraccions</b>: <span class="ex">a + el = al</span> <span class="ex">de + el = del</span> <span class="ex">per + el = pel</span></li>`,
+      qs: [
+        Q("____ gat dorm al sofà.", ["El", "La", "L'"], "<b>gat</b> és masculí i comença per consonant: <b>el gat</b>."),
+        Q("____ àvia té tres gats.", ["L'", "La", "El"], "<b>àvia</b> comença per vocal: <b>l'àvia</b>."),
+        Q("____ ós és molt gran.", ["L'", "El", "La"], "<b>ós</b> comença per vocal: <b>l'ós</b>."),
+        Q("____ gates juguen al jardí.", ["Les", "Els", "La"], "<b>gates</b> és femení i plural: <b>les gates</b>."),
+        Q("____ hora de sopar ha arribat!", ["L'", "La", "El"], "La h no sona, així que apostrofem: <b>l'hora</b>."),
+        Q("Vaig ____ parc amb el meu gat. (a + el)", ["al", "a el", "del"], "<b>a + el = al</b>. Mai escrivim «a el»."),
+        Q("La cua ____ gat és llarga. (de + el)", ["del", "de el", "al"], "<b>de + el = del</b>."),
+        Q("Passegem ____ carrer. (per + el)", ["pel", "per el", "del"], "<b>per + el = pel</b>."),
+        Q("Quina frase està ben escrita?", ["La universitat", "L'universitat", "El universitat"], "És femení i la u no és tònica (u-ni-ver-si-<b>TAT</b>): <b>la universitat</b>, sense apòstrof."),
+        Q("____ gata és la més dormilega.", ["Aquesta", "Aquest", "Aquests"], "<b>gata</b> és femení i singular: <b>aquesta gata</b>."),
+        Q("A <b>aquella gata</b>, quin determinant és <b>aquella</b>?", ["Demostratiu", "Possessiu", "Numeral"], "<b>aquella</b> assenyala: és un demostratiu."),
+        Q("A <b>el meu gat</b>, quin determinant és <b>meu</b>?", ["Possessiu", "Demostratiu", "Quantitatiu"], "<b>meu</b> diu de qui és: és un possessiu."),
+        Q("A <b>tres gatets</b>, quin determinant és <b>tres</b>?", ["Numeral", "Article", "Possessiu"], "<b>tres</b> és un número: és un numeral."),
+        Q("A <b>molts gats</b>, quin determinant és <b>molts</b>?", ["Quantitatiu", "Demostratiu", "Article"], "<b>molts</b> diu una quantitat, però no exacta: és un quantitatiu."),
+        Q("Quina d'aquestes paraules <b>NO</b> és un determinant?", ["gat", "aquest", "molts"], "<b>gat</b> és un nom. Els determinants van davant del nom."),
+        Q("A <b>una gata blanca</b>, quin determinant és <b>una</b>?", ["Article indeterminat", "Possessiu", "Demostratiu"], "<b>un, una, uns, unes</b> són articles indeterminats.")
+      ]
+    },
+    {
+      title: "Paraules de set vides",
+      sub: "Paraules polisèmiques",
+      roof: "var(--roof-5)",
+      tip: `
+        <li>Una paraula <b>polisèmica</b> té <b>més d'un significat</b>. Com els gats, que diuen que tenen set vides!</li>
+        <li><span class="ex">gat</span> és un animal… però també és l'eina que aixeca el cotxe per canviar una roda!</li>
+        <li><span class="ex">ratolí</span> és un animal que agrada molt als gats… i també el que mous amb la mà a l'ordinador.</li>
+        <li>Per saber quin significat té, mira la <b>frase</b> on és la paraula.</li>`,
+      qs: [
+        Q("Quina paraula és un animal que menja formatge i també un aparell de l'ordinador?", ["ratolí", "teclat", "gat"], "<b>ratolí</b>: animalet i aparell per moure la fletxa a la pantalla."),
+        Q("La té el gat darrere, i també la fem quan esperem en fila. Què és?", ["cua", "pota", "orella"], "<b>cua</b>: la del gat i la de «fer cua» al súper."),
+        Q("Pot ser d'un arbre o d'un ganivet. Què és?", ["fulla", "branca", "arrel"], "<b>fulla</b>: la de l'arbre i la part que talla del ganivet."),
+        Q("Hi seus al parc, però també hi guardes els diners. Què és?", ["banc", "sofà", "guardiola"], "<b>banc</b>: per seure i també l'entitat on es guarden els diners."),
+        Q("La de la taula i la del gat. Què és?", ["pota", "braç", "ungla"], "<b>pota</b>: les potes del gat i les potes de la taula."),
+        Q("Pot brillar al cel o ser una persona molt famosa. Què és?", ["estrella", "lluna", "núvol"], "<b>estrella</b>: la del cel i l'estrella de cinema."),
+        Q("Serveix per tastar i també és un idioma, com el català. Què és?", ["llengua", "boca", "dent"], "<b>llengua</b>: la de la boca i la que parlem."),
+        Q("La tenen els ocells i abans servia per escriure. Què és?", ["ploma", "ala", "bec"], "<b>ploma</b>: la de l'ocell i la ploma d'escriure."),
+        Q("Serveix per pescar peixos i també connecta els ordinadors. Què és?", ["xarxa", "canya", "barca"], "<b>xarxa</b>: la del pescador i la xarxa d'internet. Peixos per als gats!"),
+        Q("«El mecànic fa servir un <b>gat</b> per aixecar el cotxe.» Aquí <b>gat</b> vol dir…", ["Una eina", "Un animal", "Una joguina"], "En aquesta frase, el <b>gat</b> és una eina per aixecar el cotxe."),
+        Q("«Vivim a la tercera <b>planta</b>.» Aquí <b>planta</b> vol dir…", ["Un pis de l'edifici", "Un vegetal", "La part de sota del peu"], "Aquí <b>planta</b> és el pis on vius."),
+        Q("«Hem donat una <b>mà</b> de pintura a la paret.» Aquí <b>mà</b> vol dir…", ["Una capa", "Una part del cos", "Un guant"], "Una <b>mà de pintura</b> és una capa de pintura."),
+        Q("«Al cinema hi havia molta <b>cua</b>.» Aquí <b>cua</b> vol dir…", ["Una fila de gent", "La cua d'un animal", "Un pentinat"], "Aquí <b>cua</b> és la fila de gent que espera."),
+        Q("«El <b>cap</b> de la colla ha arribat.» Aquí <b>cap</b> vol dir…", ["La persona que mana", "Una part del cos", "Cap ni un"], "Aquí <b>cap</b> és la persona que dirigeix el grup."),
+        Q("«He fet clic amb el <b>ratolí</b>.» Aquí <b>ratolí</b> vol dir…", ["Un aparell de l'ordinador", "Un animal", "Un formatge"], "Aquí és el <b>ratolí</b> de l'ordinador. Els gats no el poden caçar!")
+      ]
+    }
+  ];
+
+  const PER_LEVEL = 8;
+  const PRAISE = ["Miau! Molt bé", "Purrr… perfecte", "Ets una màquina", "Bigotis de campiona", "Genial", "Miau-meravellós"];
+  const OOPS = ["Uix, gairebé", "Ai, aquesta no", "Miau… no passa res", "Quasi quasi"];
+
+  /* ---------- Estat ---------- */
+  const KEY = "terratDelsGats.v1";
+  let state = { name: "", color: "taronja", fish: 0, stars: {} };
+  try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s === "object") state = Object.assign(state, s); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  let sound = true, actx = null;
+  let cur = null; // { level, qs, i, score, results }
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const nameHtml = () => esc(state.name);
+
+  function makeCat(el, color, mood) {
+    el.innerHTML = CAT_SVG;
+    el.dataset.color = color;
+    el.classList.remove("happy", "sad");
+    if (mood) el.classList.add(mood);
+  }
+  function setMood(el, mood) {
+    el.classList.remove("happy", "sad");
+    void el.offsetWidth; // reinicia l'animació
+    if (mood) el.classList.add(mood);
+  }
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((s) => { s.hidden = s.id !== id; });
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+  function updateFish() {
+    $("fishMap").textContent = state.fish;
+    $("fishQ").textContent = state.fish;
+  }
+  document.querySelectorAll(".fishicon").forEach((n) => { n.outerHTML = FISH_SVG; });
+
+  /* ---------- Sons ---------- */
+  function audio() {
+    if (!sound) return null;
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); return actx; } catch (e) { return null; }
+  }
+  function meow() {
+    const c = audio(); if (!c) return;
+    const t = c.currentTime, o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain();
+    o.type = "sawtooth"; f.type = "bandpass"; f.frequency.value = 1300; f.Q.value = 1.6;
+    o.frequency.setValueAtTime(520, t); o.frequency.linearRampToValueAtTime(880, t + 0.16); o.frequency.linearRampToValueAtTime(460, t + 0.55);
+    f.frequency.setValueAtTime(900, t); f.frequency.linearRampToValueAtTime(1700, t + 0.18); f.frequency.linearRampToValueAtTime(800, t + 0.55);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.35, t + 0.05); g.gain.linearRampToValueAtTime(0.25, t + 0.35); g.gain.linearRampToValueAtTime(0, t + 0.6);
+    o.connect(f); f.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.62);
+  }
+  function boop() {
+    const c = audio(); if (!c) return;
+    const t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+    o.type = "triangle"; o.frequency.setValueAtTime(300, t); o.frequency.linearRampToValueAtTime(170, t + 0.3);
+    g.gain.setValueAtTime(0.25, t); g.gain.linearRampToValueAtTime(0, t + 0.35);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.36);
+  }
+  function fanfare() {
+    const c = audio(); if (!c) return;
+    [523, 659, 784, 1047].forEach((fr, k) => {
+      const t = c.currentTime + k * 0.13, o = c.createOscillator(), g = c.createGain();
+      o.type = "triangle"; o.frequency.value = fr;
+      g.gain.setValueAtTime(0.22, t); g.gain.linearRampToValueAtTime(0, t + 0.3);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.32);
+    });
+  }
+  document.querySelectorAll(".sound-toggle").forEach((b) => b.addEventListener("click", () => {
+    sound = !sound;
+    document.querySelectorAll(".sound-toggle").forEach((x) => { x.textContent = sound ? "So: sí" : "So: no"; });
+    if (sound) meow();
+  }));
+
+  function popFish(fromEl) {
+    const r = fromEl.getBoundingClientRect();
+    const d = document.createElement("div");
+    d.className = "pop"; d.innerHTML = FISH_SVG;
+    d.style.left = (r.left + r.width / 2 - 24) + "px"; d.style.top = (r.top) + "px";
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 1200);
+  }
+
+  /* ---------- Inici ---------- */
+  makeCat($("startCat"), state.color);
+  const sw = $("swatches");
+  COLORS.forEach(([id, label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "swatch"; b.setAttribute("aria-pressed", String(state.color === id));
+    b.innerHTML = `<span class="cat" data-color="${id}">${CAT_SVG}</span>${label}`;
+    b.addEventListener("click", () => {
+      state.color = id;
+      sw.querySelectorAll(".swatch").forEach((x) => x.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+      makeCat($("startCat"), id, "happy");
+      meow();
+    });
+    sw.appendChild(b);
+  });
+  const input = $("nameInput");
+  input.value = state.name;
+  const checkName = () => { $("goBtn").disabled = input.value.trim().length === 0; };
+  input.addEventListener("input", checkName);
+  checkName();
+  $("nameForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const n = input.value.trim();
+    if (!n) return;
+    state.name = n; save(); meow();
+    renderMap(); show("s-map");
+  });
+  $("changeName").addEventListener("click", () => { input.value = state.name; checkName(); makeCat($("startCat"), state.color); show("s-start"); input.focus(); });
+  document.querySelectorAll(".back").forEach((b) => b.addEventListener("click", () => { renderMap(); show("s-map"); }));
+
+  /* ---------- Mapa ---------- */
+  function renderMap() {
+    $("helloName").textContent = state.name;
+    makeCat($("mapCat"), state.color, "happy");
+    updateFish();
+    const box = $("roofs"); box.innerHTML = "";
+    LEVELS.forEach((lv, i) => {
+      const st = state.stars[i] || 0;
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "house"; b.style.setProperty("--roof", lv.roof);
+      b.innerHTML = `<span class="num">${i + 1}</span><h3>${lv.title}</h3><p>${lv.sub}</p>
+        <div class="stars" aria-label="${st} de 3 estrelles">${STAR_SVG(st >= 1)}${STAR_SVG(st >= 2)}${STAR_SVG(st >= 3)}</div>`;
+      b.addEventListener("click", () => openTip(i));
+      box.appendChild(b);
+    });
+    const all = LEVELS.every((_, i) => (state.stars[i] || 0) >= 1);
+    $("diplomaCta").hidden = !all;
+  }
+  $("openDiploma").addEventListener("click", openDiploma);
+
+  /* ---------- Truc ---------- */
+  function openTip(i) {
+    const lv = LEVELS[i];
+    cur = { level: i };
+    const tip = $("tipBox");
+    tip.style.setProperty("--roof", lv.roof);
+    $("s-tip").style.setProperty("--roof", lv.roof);
+    tip.innerHTML = `<div class="tip-head"><div class="cat happy" id="tipCat"></div>
+      <div><p class="label">El truc del gat · Teulada ${i + 1}</p><h2>${lv.title}</h2></div></div>
+      <ul>${lv.tip}</ul>
+      <p class="hint">Llegeix-ho amb calma, ${nameHtml()}. Després vindran ${PER_LEVEL} preguntes!</p>`;
+    makeCat($("tipCat"), state.color, "happy");
+    show("s-tip");
+  }
+  $("startLevel").addEventListener("click", () => startLevel(cur.level));
+
+  /* ---------- Joc ---------- */
+  function startLevel(i) {
+    const lv = LEVELS[i];
+    cur = { level: i, qs: shuffle(lv.qs).slice(0, PER_LEVEL), i: 0, score: 0, results: [] };
+    $("s-q").style.setProperty("--roof", lv.roof);
+    makeCat($("qCat"), state.color);
+    renderQ();
+    show("s-q");
+  }
+  function renderPaws() {
+    $("paws").innerHTML = cur.qs.map((_, k) => PAW_SVG(cur.results[k] === true ? "ok" : cur.results[k] === false ? "ko" : k === cur.i ? "now" : "")).join("");
+  }
+  function renderQ() {
+    const q = cur.qs[cur.i];
+    renderPaws();
+    setMood($("qCat"), null);
+    $("qText").innerHTML = q.q;
+    const order = q.fixed ? q.o.map((_, k) => k) : shuffle(q.o.map((_, k) => k));
+    const box = $("opts"); box.innerHTML = "";
+    order.forEach((k) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "opt"; b.textContent = q.o[k]; b.dataset.k = k;
+      b.addEventListener("click", () => answer(k, b));
+      box.appendChild(b);
+    });
+    $("feedback").hidden = true;
+  }
+  function answer(k, btn) {
+    const q = cur.qs[cur.i];
+    const ok = k === q.a;
+    document.querySelectorAll("#opts .opt").forEach((b) => {
+      b.disabled = true;
+      if (Number(b.dataset.k) === q.a) b.classList.add("right");
+    });
+    if (!ok) btn.classList.add("wrong");
+    cur.results[cur.i] = ok;
+    if (ok) { cur.score++; state.fish++; save(); updateFish(); meow(); popFish(btn); }
+    else boop();
+    setMood($("qCat"), ok ? "happy" : "sad");
+    renderPaws();
+    const last = cur.i === cur.qs.length - 1;
+    const fb = $("feedback");
+    fb.className = "feedback " + (ok ? "ok" : "ko");
+    fb.innerHTML = `<h3>${ok ? pick(PRAISE) + ", " + nameHtml() + "!" : pick(OOPS) + "!"}</h3>
+      <p class="why">${q.why}</p>
+      <div class="row"><span class="hint">${ok ? "Has pescat un peix per al teu gat." : "La resposta bona és la verda."}</span>
+      <button class="btn small" type="button" id="nextBtn">${last ? "Veure resultat" : "Següent"}</button></div>`;
+    fb.hidden = false;
+    const nb = $("nextBtn");
+    nb.addEventListener("click", next);
+    nb.focus({ preventScroll: true });
+    fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function next() {
+    if (cur.i < cur.qs.length - 1) { cur.i++; renderQ(); window.scrollTo({ top: 0 }); }
+    else finish();
+  }
+  function starsFor(score) { return score >= PER_LEVEL ? 3 : score >= 6 ? 2 : score >= 4 ? 1 : 0; }
+  function finish() {
+    const i = cur.level, s = cur.score, st = starsFor(s);
+    const prev = state.stars[i] || 0;
+    if (st > prev) { state.stars[i] = st; save(); }
+    const allDone = LEVELS.every((_, k) => (state.stars[k] || 0) >= 1);
+    const msg = st === 3 ? `Perfecte, ${nameHtml()}! Totes bé. El teu gat fa ronc-ronc de felicitat.`
+      : st === 2 ? `Molt bé, ${nameHtml()}! Gairebé totes. Vols intentar les tres estrelles?`
+      : st === 1 ? `Bona feina, ${nameHtml()}! Rellegeix el truc del gat i torna-ho a provar.`
+      : `No passa res, ${nameHtml()}. Els gats també cauen de vegades, i s'aixequen! Llegeix el truc i torna-hi.`;
+    const r = $("s-result");
+    r.style.setProperty("--roof", LEVELS[i].roof);
+    r.innerHTML = `<div class="cat ${st >= 1 ? "happy" : "sad"}" id="resCat"></div>
+      <h2>${LEVELS[i].title}</h2>
+      <div class="stars">${STAR_SVG(st >= 1)}${STAR_SVG(st >= 2)}${STAR_SVG(st >= 3)}</div>
+      <p style="font-size:1.25rem;font-weight:800">Has pescat ${s} de ${PER_LEVEL} peixos!</p>
+      <p style="max-width:46ch">${msg}</p>
+      ${allDone ? `<p class="hint">Ja has visitat totes les teulades: tens un diploma al terrat!</p>` : ""}
+      <div class="row">
+        <button class="btn ghost" type="button" id="againBtn">Tornar a jugar</button>
+        <button class="btn" type="button" id="mapBtn">Anar al terrat</button>
+      </div>`;
+    makeCat($("resCat"), state.color, st >= 1 ? "happy" : "sad");
+    $("againBtn").addEventListener("click", () => startLevel(i));
+    $("mapBtn").addEventListener("click", () => { renderMap(); show("s-map"); });
+    show("s-result");
+    if (st >= 1) fanfare(); else boop();
+  }
+
+  /* ---------- Diploma ---------- */
+  function openDiploma() {
+    $("dipName").textContent = state.name;
+    const total = LEVELS.reduce((a, _, k) => a + (state.stars[k] || 0), 0);
+    $("dipFish").textContent = `${state.fish} peixos pescats · ${total} de ${LEVELS.length * 3} estrelles`;
+    const cats = $("dipCats"); cats.innerHTML = "";
+    [state.color, ...COLORS.map((c) => c[0]).filter((c) => c !== state.color)].forEach((c) => {
+      const d = document.createElement("div"); d.className = "cat happy"; makeCat(d, c, "happy"); cats.appendChild(d);
+    });
+    show("s-diploma"); fanfare();
+  }
+
+  /* ---------- Arrencada ---------- */
+  if (state.name) { renderMap(); show("s-map"); } else { show("s-start"); }
+})();
+</script>
